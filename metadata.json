@@ -1,0 +1,8 @@
+{
+  "name": "Cyber Board Game",
+  "description": "ระบบเกมกระดานออนไลน์ภาษาไทย พร้อมสถาปัตยกรรม Game Engine มืออาชีพ",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

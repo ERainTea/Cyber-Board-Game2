@@ -1,0 +1,352 @@
+/**
+ * @file src/game/Board.ts
+ * @description ข้อมูลตารางกระดานเกม (Board Tiles Configuration) 24 ช่อง
+ * ครอบคลุมสถานที่สำคัญในประเทศไทย และช่องพิเศษต่างๆ
+ */
+
+import { BoardTile } from './types';
+import { ASSET_URLS } from './Assets';
+
+/** รายชื่อช่องบนกระดาน 24 ช่อง */
+export const INITIAL_BOARD: BoardTile[] = [
+  // --- BOTTOM ROW (0 - 6) ---
+  {
+    id: 0,
+    name: 'จุดเริ่มต้น',
+    type: 'START',
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    description: 'รับเงิน 2,000 บาทเมื่อเดินผ่านหรือตกช่องนี้',
+  },
+  {
+    id: 1,
+    name: 'นครปฐม',
+    type: 'PROPERTY',
+    colorGroup: 'BROWN',
+    price: 1000,
+    baseRent: 100,
+    rentLevels: [100, 300, 600, 1200, 2000],
+    housePrice: 500,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    imageUrl: ASSET_URLS.landmarks.ayutthaya,
+  },
+  {
+    id: 2,
+    name: 'หีบสมบัติ',
+    type: 'CHEST',
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    description: 'เปิดการ์ดหีบสมบัติเพื่อรับโบนัสพิเศษ',
+  },
+  {
+    id: 3,
+    name: 'สุพรรณบุรี',
+    type: 'PROPERTY',
+    colorGroup: 'BROWN',
+    price: 1200,
+    baseRent: 120,
+    rentLevels: [120, 350, 700, 1400, 2400],
+    housePrice: 500,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+  },
+  {
+    id: 4,
+    name: 'ภาษีบำรุงเมือง',
+    type: 'TAX',
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    description: 'จ่ายภาษีพัฒนาท้องถิ่น 1,000 บาท',
+  },
+  {
+    id: 5,
+    name: 'สถานีรถไฟหัวลำโพง',
+    type: 'TRANSPORT',
+    colorGroup: 'SPECIAL',
+    price: 2000,
+    baseRent: 250,
+    rentLevels: [250, 500, 1000, 2000],
+    housePrice: 0,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+  },
+  {
+    id: 6,
+    name: 'คุก / เยี่ยมชม',
+    type: 'JAIL',
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    description: 'เยี่ยมชมเพื่อน หรือถูกขังอยู่หากโดนลงโทษ',
+  },
+
+  // --- LEFT COLUMN (7 - 11) ---
+  {
+    id: 7,
+    name: 'อยุธยา',
+    type: 'PROPERTY',
+    colorGroup: 'LIGHT_BLUE',
+    price: 1600,
+    baseRent: 160,
+ rentLevels: [160, 450, 900, 1800, 3200],
+    housePrice: 800,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    imageUrl: ASSET_URLS.landmarks.ayutthaya,
+  },
+  {
+    id: 8,
+    name: 'การประปา',
+    type: 'UTILITY',
+    colorGroup: 'SPECIAL',
+    price: 1500,
+    baseRent: 200,
+    rentLevels: [200, 600],
+    housePrice: 0,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+  },
+  {
+    id: 9,
+    name: 'สุโขทัย',
+    type: 'PROPERTY',
+    colorGroup: 'LIGHT_BLUE',
+    price: 1800,
+    baseRent: 180,
+    rentLevels: [180, 500, 1000, 2000, 3600],
+    housePrice: 800,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+  },
+  {
+    id: 10,
+    name: 'เสี่ยงโชค',
+    type: 'CHANCE',
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    description: 'เปิดการ์ดโชคชะตาเพื่อวัดดวง',
+  },
+  {
+    id: 11,
+    name: 'พิษณุโลก',
+    type: 'PROPERTY',
+    colorGroup: 'LIGHT_BLUE',
+    price: 2000,
+    baseRent: 200,
+    rentLevels: [200, 600, 1200, 2400, 4000],
+    housePrice: 800,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+  },
+
+  // --- TOP ROW (12 - 18) ---
+  {
+    id: 12,
+    name: 'จุดพักผ่อนฟรี',
+    type: 'FREE_PARKING',
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    description: 'จุดจอดรถพักผ่อน ปลอดภัย ไม่ต้องจ่ายเงิน',
+  },
+  {
+    id: 13,
+    name: 'หัวหิน',
+    type: 'PROPERTY',
+    colorGroup: 'PINK',
+    price: 2400,
+    baseRent: 240,
+    rentLevels: [240, 700, 1400, 2800, 4800],
+    housePrice: 1000,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+  },
+  {
+    id: 14,
+    name: 'พัทยา',
+    type: 'PROPERTY',
+    colorGroup: 'PINK',
+    price: 2600,
+    baseRent: 260,
+    rentLevels: [260, 750, 1500, 3000, 5200],
+    housePrice: 1000,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    imageUrl: ASSET_URLS.landmarks.pattaya,
+  },
+  {
+    id: 15,
+    name: 'สถานีรถไฟเชียงใหม่',
+    type: 'TRANSPORT',
+    colorGroup: 'SPECIAL',
+    price: 2000,
+    baseRent: 250,
+    rentLevels: [250, 500, 1000, 2000],
+    housePrice: 0,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+  },
+  {
+    id: 16,
+    name: 'เชียงใหม่',
+    type: 'PROPERTY',
+    colorGroup: 'PINK',
+    price: 2800,
+    baseRent: 280,
+    rentLevels: [280, 800, 1600, 3200, 5600],
+    housePrice: 1000,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    imageUrl: ASSET_URLS.landmarks.chiangmai,
+  },
+  {
+    id: 17,
+    name: 'หีบสมบัติ',
+    type: 'CHEST',
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    description: 'เปิดการ์ดหีบสมบัติเพื่อรับโบนัสพิเศษ',
+  },
+  {
+    id: 18,
+    name: 'เชียงราย',
+    type: 'PROPERTY',
+    colorGroup: 'ORANGE',
+    price: 3000,
+    baseRent: 300,
+    rentLevels: [300, 900, 1800, 3600, 6000],
+    housePrice: 1200,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+  },
+
+  // --- RIGHT COLUMN (19 - 23) ---
+  {
+    id: 19,
+    name: 'ส่งเข้าคุก!',
+    type: 'GO_TO_JAIL',
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    description: 'ถูกส่งเข้าคุกทันที ห้ามผ่านจุดเริ่มต้น',
+  },
+  {
+    id: 20,
+    name: 'กระบี่',
+    type: 'PROPERTY',
+    colorGroup: 'YELLOW',
+    price: 3400,
+    baseRent: 340,
+    rentLevels: [340, 1000, 2000, 4000, 6800],
+    housePrice: 1500,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+  },
+  {
+    id: 21,
+    name: 'การไฟฟ้า',
+    type: 'UTILITY',
+    colorGroup: 'SPECIAL',
+    price: 1500,
+    baseRent: 200,
+    rentLevels: [200, 600],
+    housePrice: 0,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+  },
+  {
+    id: 22,
+    name: 'เกาะสมุย',
+    type: 'PROPERTY',
+    colorGroup: 'YELLOW',
+    price: 3600,
+    baseRent: 360,
+    rentLevels: [360, 1100, 2200, 4400, 7200],
+    housePrice: 1500,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    imageUrl: ASSET_URLS.landmarks.samui,
+  },
+  {
+    id: 23,
+    name: 'ภูเก็ต',
+    type: 'PROPERTY',
+    colorGroup: 'BLUE',
+    price: 4200,
+    baseRent: 420,
+    rentLevels: [420, 1300, 2600, 5200, 8500],
+    housePrice: 2000,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    imageUrl: ASSET_URLS.landmarks.phuket,
+  },
+  {
+    id: 24,
+    name: 'เสี่ยงโชค',
+    type: 'CHANCE',
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    description: 'เปิดการ์ดโชคชะตาเพื่อวัดดวง',
+  },
+  {
+    id: 25,
+    name: 'กรุงเทพมหานคร',
+    type: 'PROPERTY',
+    colorGroup: 'BLUE',
+    price: 5000,
+    baseRent: 500,
+    rentLevels: [500, 1600, 3200, 6400, 10000],
+    housePrice: 2000,
+    ownerId: null,
+    houseCount: 0,
+    isMortgaged: false,
+    imageUrl: ASSET_URLS.landmarks.bangkok,
+  },
+];
+
+/**
+ * ดึงข้อมูลรหัสสีประจำกลุ่มที่ดิน (Color Group Theme)
+ * @param colorGroup กลุ่มสีที่ดิน
+ * @returns { bg: string, text: string, name: string }
+ */
+export function getColorGroupMeta(colorGroup?: string) {
+  switch (colorGroup) {
+    case 'BROWN':
+      return { bg: 'bg-amber-900', border: 'border-amber-900', text: 'text-amber-100', name: 'น้ำตาล (ภาคกลางตอนล่าง)' };
+    case 'LIGHT_BLUE':
+      return { bg: 'bg-sky-500', border: 'border-sky-500', text: 'text-white', name: 'ฟ้า (ภาคเหนือตอนล่าง)' };
+    case 'PINK':
+      return { bg: 'bg-pink-500', border: 'border-pink-500', text: 'text-white', name: 'ชมพู (ภาคเหนือตอนบน)' };
+    case 'ORANGE':
+      return { bg: 'bg-orange-500', border: 'border-orange-500', text: 'text-white', name: 'ส้ม (ภาคเหนือเหนือสุด)' };
+    case 'YELLOW':
+      return { bg: 'bg-yellow-500', border: 'border-yellow-500', text: 'text-gray-900', name: 'เหลือง (ภาคใต้ตะวันออก)' };
+    case 'BLUE':
+      return { bg: 'bg-blue-600', border: 'border-blue-600', text: 'text-white', name: 'น้ำเงิน (มหานคร/ภูเก็ต)' };
+    default:
+      return { bg: 'bg-slate-700', border: 'border-slate-700', text: 'text-slate-100', name: 'พิเศษ' };
+  }
+}
