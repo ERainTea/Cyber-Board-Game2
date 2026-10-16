@@ -76,9 +76,9 @@ export class LoadingScreen {
         if (progressPercent) progressPercent.textContent = `${percent}%`;
         if (loadingCount) loadingCount.textContent = `${loaded} / ${total} รายการ`;
         if (statusText) {
-          // แปลงชื่อไฟล์แบบสั้นเพื่อแสดงผลอย่างสวยงาม
-          const fileName = currentUrl.split('/').pop().split('?')[0];
-          statusText.textContent = `กำลังโหลด: ${decodeURIComponent(fileName)}`;
+          statusText.textContent = percent < 100 
+            ? `กำลังดาวน์โหลดทรัพยากรเกม...` 
+            : 'ดาวน์โหลดข้อมูลเกมเรียบร้อยแล้ว';
         }
       });
 

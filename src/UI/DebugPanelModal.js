@@ -5,6 +5,7 @@
 
 import { gameStateStore } from '../GameState.js';
 import { stressTester } from '../Engine/StressTester.js';
+import { escapeHtml } from '../Utils/security.js';
 
 export class DebugPanelModal {
   constructor(gameBoardScreenInstance = null) {
@@ -315,8 +316,8 @@ export class DebugPanelModal {
           ${(state.players || []).map((p, idx) => `
             <tr style="${idx === state.activePlayerIndex ? 'background: rgba(56, 189, 248, 0.15);' : ''}">
               <td>${idx + 1}</td>
-              <td style="font-weight: bold; color: ${p.colorHex || '#ffffff'};">${p.name} ${idx === state.activePlayerIndex ? '👑' : ''}</td>
-              <td>${p.colorName || p.color}</td>
+              <td style="font-weight: bold; color: ${p.colorHex || '#ffffff'};">${escapeHtml(p.name)} ${idx === state.activePlayerIndex ? '👑' : ''}</td>
+              <td>${escapeHtml(p.colorName || p.color)}</td>
               <td style="font-weight: bold;">ช่องที่ ${p.position} / 30</td>
               <td>${p.skipTurns || 0} ตา</td>
               <td>${p.position >= 30 ? '🎉 เข้าเส้นชัย' : 'กำลังเล่น'}</td>

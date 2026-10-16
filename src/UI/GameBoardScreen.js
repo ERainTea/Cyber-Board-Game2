@@ -17,6 +17,7 @@ import { GameGuideModal } from './GameGuideModal.js';
 import { soundManager } from '../Audio/SoundManager.js';
 import { networkManager, NETWORK_MODES } from '../Network/NetworkManager.js';
 import { PacketManager, PACKET_TYPES } from '../Network/PacketManager.js';
+import { escapeHtml, sanitizePlainText } from '../Utils/security.js';
 
 export class GameBoardScreen {
   /**
@@ -28,6 +29,12 @@ export class GameBoardScreen {
     this.onBack = onBack;
     this.currentManualIndex = 0;
     this.manualPages = this.buildManualPagesList();
+
+    // ตัวแปรสำหรับระบบควบคุมซูมและมุมมองหน้าจอมือถือ (Cross-Platform & Mobile Optimization)
+    this.boardZoom = 1;
+    this.boardPanX = 0;
+    this.boardPanY = 0;
+    this.mobileActiveTab = 'CONTROLS'; // 'CONTROLS' | 'PLAYERS' | 'LOGS'
 
     // ระบบเรนเดอร์กระดานเกมจาก boardMap.json (Phase 5.5 BoardRenderer)
     this.boardRenderer = new BoardRenderer(boardMapData, {
@@ -296,10 +303,10 @@ export class GameBoardScreen {
               border-color: ${colorHex}; 
               box-shadow: 0 0 14px ${colorHex};
             "
-            title="${p.name} (${p.colorName || 'ตัวหมาก'}) - ตำแหน่ง: ช่องที่ ${p.position || 0}"
+            title="${escapeHtml(p.name)} (${escapeHtml(p.colorName || 'ตัวหมาก')}) - ตำแหน่ง: ช่องที่ ${p.position || 0}"
           >
             <span class="token-icon">${icon}</span>
-            <span class="token-p-badge">${p.name}</span>
+            <span class="token-p-badge">${escapeHtml(p.name)}</span>
           </div>
         `;
       })
@@ -347,7 +354,7 @@ export class GameBoardScreen {
     const colorName = player.colorName || 'ทอง';
     banner.innerHTML = `
       <div class="turn-banner-badge" style="background-color: ${colorHex}; box-shadow: 0 0 10px ${colorHex};"></div>
-      <div class="turn-banner-text">👑 ถึงตาของผู้เล่น: [${player.name}] (สี${colorName})</div>
+      <div class="turn-banner-text">👑 ถึงตาของผู้เล่น: [${escapeHtml(player.name)}] (สี${escapeHtml(colorName)})</div>
     `;
     const mainBoardArea = this.container.querySelector('.game-board-container') || this.container;
     mainBoardArea.appendChild(banner);
@@ -393,19 +400,19 @@ export class GameBoardScreen {
         <div class="tile-event-modal-body">
           <div class="tile-event-player-badge">
             <span class="player-dot" style="background: ${player.color || '#f59e0b'}"></span>
-            <span>ผู้เล่น: <strong>${player.name}${colorNameStr}</strong></span>
+            <span>ผู้เล่น: <strong>${escapeHtml(player.name)}${escapeHtml(colorNameStr)}</strong></span>
             <span class="tile-number-tag">ช่องที่ ${tile.label || tile.tile}</span>
           </div>
 
-          <h3 class="tile-event-title">${tile.title || tile.name || ''}</h3>
+          <h3 class="tile-event-title">${escapeHtml(tile.title || tile.name || '')}</h3>
 
-          <p class="tile-event-desc">${tile.description || ''}</p>
+          <p class="tile-event-desc">${escapeHtml(tile.description || '')}</p>
 
           <div class="tile-event-action-box ${isGreen ? 'green-action' : 'red-action'}">
             <span class="action-icon">${isGreen ? '🌟' : '⚡'}</span>
             <div class="action-text-group">
               <span class="action-label">${rewardTitle}</span>
-              <span class="action-value">${tile.actionText || 'ดำเนินคำสั่งตามช่อง'}</span>
+              <span class="action-value">${escapeHtml(tile.actionText || 'ดำเนินคำสั่งตามช่อง')}</span>
             </div>
           </div>
 
@@ -415,7 +422,7 @@ export class GameBoardScreen {
                   รับทราบ (ตกลง)
                 </button>`
               : `<button id="btn-close-tile-event" class="tile-event-confirm-btn ${isGreen ? 'green-btn' : 'red-btn'}" disabled style="opacity: 0.88; cursor: default; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; font-size: 0.92rem; justify-content: center; display: flex; align-items: center; gap: 0.5rem; box-shadow: none;">
-                  <span>⏳</span> รอ [${player.name}] กดยืนยันรับทราบ...
+                  <span>⏳</span> รอ [${escapeHtml(player.name)}] กดยืนยันรับทราบ...
                 </button>`
           }
         </div>
@@ -600,7 +607,7 @@ export class GameBoardScreen {
           <div class="player-row-top">
             <div class="player-identity">
               <span class="player-color-dot" style="background: ${colorHex}; box-shadow: 0 0 8px ${colorHex};"></span>
-              <span class="player-row-name">${p.name}</span>
+              <span class="player-row-name">${escapeHtml(p.name)}</span>
             </div>
             <span class="player-token-badge" style="background: rgba(255, 255, 255, 0.05); color: ${colorHex}; border: 1px solid ${colorHex}66; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700;">
               ${statusBadgeText}
@@ -610,17 +617,17 @@ export class GameBoardScreen {
           <div class="player-details-grid">
             <div class="detail-item">
               <span class="detail-label">สีตัวหมาก:</span>
-              <span class="detail-val" style="color: ${colorHex}; font-weight: 700;">${colorName}</span>
+              <span class="detail-val" style="color: ${colorHex}; font-weight: 700;">${escapeHtml(colorName)}</span>
             </div>
 
             <div class="detail-item">
               <span class="detail-label">ลำดับการเล่น:</span>
-              <span class="detail-val ${p.turnOrderRank ? 'text-gold' : 'text-muted'}">${p.turnOrder || 'รอทอยเต๋า'}</span>
+              <span class="detail-val ${p.turnOrderRank ? 'text-gold' : 'text-muted'}">${escapeHtml(p.turnOrder || 'รอทอยเต๋า')}</span>
             </div>
 
             <div class="detail-item">
               <span class="detail-label">สถานะ:</span>
-              <span class="detail-val text-success">🟢 ${p.status}</span>
+              <span class="detail-val text-success">🟢 ${escapeHtml(p.status || 'ปกติ')}</span>
             </div>
 
             <div class="detail-item">
@@ -696,8 +703,18 @@ export class GameBoardScreen {
         <main class="game-main-content">
           <!-- ฝั่งซ้าย: พื้นที่กระดานเกม (Board Area) -->
           <section class="board-viewport-section">
-            <div class="board-container-card">
-              ${this.boardRenderer.renderBoardContainerHTML(boardUrl, this.renderBoardTokens())}
+            <div class="board-container-card" id="board-container-card">
+              <!-- แถบเครื่องมือซูมและจัดมุมมองบอร์ดสำหรับทุกอุปกรณ์ -->
+              <div class="board-zoom-hud" id="board-zoom-hud">
+                <button class="board-hud-btn" id="btn-zoom-in" title="ซูมขยาย (+)">➕</button>
+                <button class="board-hud-btn" id="btn-zoom-out" title="ซูมย่อ (-)">➖</button>
+                <button class="board-hud-btn highlight" id="btn-zoom-focus" title="โฟกัสตำแหน่งตัวหมากปัจจุบัน">🎯 ติดตามหมาก</button>
+                <button class="board-hud-btn" id="btn-zoom-reset" title="รีเซ็ตขนาดปกติ">↺ 100%</button>
+              </div>
+
+              <div class="board-viewport-pan-wrapper" id="board-viewport-pan-wrapper">
+                ${this.boardRenderer.renderBoardContainerHTML(boardUrl, this.renderBoardTokens())}
+              </div>
 
               <!-- คำชี้แจงสถานะระบบ -->
               <div class="board-footer-notice" id="board-footer-notice">
@@ -707,9 +724,9 @@ export class GameBoardScreen {
           </section>
 
           <!-- ฝั่งขวา: แผงควบคุมและข้อมูลเกม (Side Panel) -->
-          <aside class="game-sidebar-section">
+          <aside class="game-sidebar-section" id="game-sidebar-section">
             <!-- 1. รายชื่อผู้เล่นทั้งหมด และสถานะ -->
-            <div class="sidebar-card players-status-card">
+            <div class="sidebar-card players-status-card" id="sidebar-players-card">
               <div class="card-header-bar">
                 <h3 class="card-title">👥 ข้อมูลผู้เล่นทั้งหมด (${this.players.length} คน)</h3>
               </div>
@@ -720,7 +737,7 @@ export class GameBoardScreen {
             </div>
 
             <!-- 2. พื้นที่สำหรับลูกเต๋า และ การ์ดสถานการณ์ -->
-            <div class="sidebar-grid-two-cols">
+            <div class="sidebar-grid-two-cols" id="sidebar-dice-card">
               <!-- พื้นที่ลูกเต๋า -->
               <div class="sidebar-card dice-area-card">
                 <div class="card-header-bar">
@@ -741,19 +758,19 @@ export class GameBoardScreen {
                   </div>
 
                   <div class="dice-status-badge" id="dice-status-text">
-                    ${this.phase === 'DETERMINE_ORDER' ? `🎯 คิวกดทอยเต๋า: ${currentRollingPlayer.name}` : '👑 ถึงเทิร์นทอยเต๋า'}
+                    ${this.phase === 'DETERMINE_ORDER' ? `🎯 คิวกดทอยเต๋า: ${escapeHtml(currentRollingPlayer.name)}` : '👑 ถึงเทิร์นทอยเต๋า'}
                   </div>
 
                   <button class="btn-action btn-roll-dice-active" id="btn-roll-dice">
                     <span class="btn-icon">🎲</span>
-                    <span id="btn-roll-text">${this.phase === 'DETERMINE_ORDER' ? `${currentRollingPlayer.name} ทอยเต๋า` : 'ทอยลูกเต๋า'}</span>
+                    <span id="btn-roll-text">${this.phase === 'DETERMINE_ORDER' ? `${escapeHtml(currentRollingPlayer.name)} ทอยเต๋า` : 'ทอยลูกเต๋า'}</span>
                   </button>
                 </div>
               </div>
             </div>
 
             <!-- 3. ประวัติการเล่น (Game Log) -->
-            <div class="sidebar-card game-log-card">
+            <div class="sidebar-card game-log-card" id="sidebar-log-card">
               <div class="card-header-bar">
                 <h3 class="card-title">📜 ประวัติการเล่น (Game Log)</h3>
               </div>
@@ -777,12 +794,40 @@ export class GameBoardScreen {
                 </div>
                 <div class="log-entry log-info">
                   <span class="log-time">[${timeStr}]</span>
-                  <span class="log-text">🎯 [${currentRollingPlayer.name}] กรุณาทอยลูกเต๋ากำหนดลำดับคนแรก</span>
+                  <span class="log-text">🎯 [${escapeHtml(currentRollingPlayer.name)}] กรุณาทอยลูกเต๋ากำหนดลำดับคนแรก</span>
                 </div>
               </div>
             </div>
           </aside>
         </main>
+
+        <!-- แผงควบคุมลอยด้านล่างสำหรับหน้าจอมือถือและแท็บเล็ต (Mobile Ergonomic Dock) -->
+        <div class="mobile-board-dock" id="mobile-board-dock">
+          <div class="mobile-dock-turn-bar" id="mobile-dock-turn-bar">
+            <div class="mobile-dock-turn-info">
+              <span class="mobile-turn-dot" id="mobile-turn-dot" style="background: ${currentRollingPlayer.color || '#f59e0b'}; box-shadow: 0 0 8px ${currentRollingPlayer.color || '#f59e0b'};"></span>
+              <span class="mobile-turn-name" id="mobile-turn-name">
+                ${this.phase === 'DETERMINE_ORDER' ? `🎯 คิว: ${escapeHtml(currentRollingPlayer.name)}` : `👑 ถึงตา: ${escapeHtml(this.players[this.activePlayerIndex]?.name || 'ผู้เล่น')}`}
+              </span>
+            </div>
+            <div class="mobile-dock-roll-container">
+              <button class="btn-mobile-roll-dice" id="btn-mobile-roll-dice">
+                <span id="btn-mobile-roll-text">${this.phase === 'DETERMINE_ORDER' ? `${escapeHtml(currentRollingPlayer.name)} ทอยเต๋า` : '🎲 ทอยลูกเต๋า'}</span>
+              </button>
+            </div>
+          </div>
+          <div class="mobile-dock-tabs">
+            <button class="mobile-tab-btn active" data-tab="CONTROLS" id="mobile-tab-controls">
+              <span>🎲</span><span>แผงทอยเต๋า</span>
+            </button>
+            <button class="mobile-tab-btn" data-tab="PLAYERS" id="mobile-tab-players">
+              <span>👥</span><span>ผู้เล่น (${this.players.length})</span>
+            </button>
+            <button class="mobile-tab-btn" data-tab="LOGS" id="mobile-tab-logs">
+              <span>📜</span><span>ประวัติเกม</span>
+            </button>
+          </div>
+        </div>
 
         <!-- Modal Container สำหรับปุ่มเปิดคู่มือ / ตั้งค่า / ยืนยันออก -->
         <div class="modal-overlay hidden" id="game-modal-overlay">
@@ -846,6 +891,195 @@ export class GameBoardScreen {
           this.diceEngine.roll();
         }
       };
+    }
+
+    // ปุ่มทอยเต๋าบน Mobile Bottom Dock (สำหรับมือถือและแท็บเล็ต)
+    const btnMobileRoll = this.container.querySelector('#btn-mobile-roll-dice');
+    if (btnMobileRoll && btnRoll) {
+      btnMobileRoll.onclick = () => {
+        btnRoll.click();
+      };
+    }
+
+    // แผงสลับแท็บบน Mobile Dock (ควบคุม / ผู้เล่น / บันทึก)
+    const mobileTabs = this.container.querySelectorAll('.mobile-tab-btn');
+    mobileTabs.forEach((tabBtn) => {
+      tabBtn.onclick = () => {
+        const tab = tabBtn.getAttribute('data-tab');
+        if (tab) {
+          this.switchMobileTab(tab);
+        }
+      };
+    });
+
+    // ปุ่มเครื่องมือซูมกระดาน (Board Zoom HUD)
+    const btnZoomIn = this.container.querySelector('#btn-zoom-in');
+    const btnZoomOut = this.container.querySelector('#btn-zoom-out');
+    const btnZoomReset = this.container.querySelector('#btn-zoom-reset');
+    const btnZoomFocus = this.container.querySelector('#btn-zoom-focus');
+
+    if (btnZoomIn) btnZoomIn.onclick = () => this.setBoardZoom(this.boardZoom + 0.25);
+    if (btnZoomOut) btnZoomOut.onclick = () => this.setBoardZoom(this.boardZoom - 0.25);
+    if (btnZoomReset) btnZoomReset.onclick = () => this.setBoardZoom(1, 0, 0);
+    if (btnZoomFocus) btnZoomFocus.onclick = () => this.focusCurrentPlayer();
+
+    // รองรับการสัมผัสเลื่อนกระดาน (Touch Pan / Mouse Drag) เมื่อซูมขยาย
+    const panWrapper = this.container.querySelector('#board-viewport-pan-wrapper');
+    if (panWrapper) {
+      let isDragging = false;
+      let startX = 0;
+      let startY = 0;
+      let initPanX = 0;
+      let initPanY = 0;
+
+      const handlePanStart = (clientX, clientY) => {
+        if (this.boardZoom <= 1) return;
+        isDragging = true;
+        startX = clientX;
+        startY = clientY;
+        initPanX = this.boardPanX;
+        initPanY = this.boardPanY;
+      };
+
+      const handlePanMove = (clientX, clientY) => {
+        if (!isDragging) return;
+        const dx = clientX - startX;
+        const dy = clientY - startY;
+        this.boardPanX = initPanX + dx / this.boardZoom;
+        this.boardPanY = initPanY + dy / this.boardZoom;
+        this.applyBoardTransform();
+      };
+
+      panWrapper.addEventListener('mousedown', (e) => handlePanStart(e.clientX, e.clientY));
+      window.addEventListener('mousemove', (e) => handlePanMove(e.clientX, e.clientY));
+      window.addEventListener('mouseup', () => { isDragging = false; });
+
+      let initPinchDist = 0;
+      let initPinchZoom = 1;
+      let lastTapTime = 0;
+
+      panWrapper.addEventListener(
+        'touchstart',
+        (e) => {
+          if (e.touches.length === 1) {
+            handlePanStart(e.touches[0].clientX, e.touches[0].clientY);
+          } else if (e.touches.length === 2) {
+            isDragging = false;
+            initPinchDist = Math.hypot(
+              e.touches[0].clientX - e.touches[1].clientX,
+              e.touches[0].clientY - e.touches[1].clientY
+            );
+            initPinchZoom = this.boardZoom;
+          }
+        },
+        { passive: true }
+      );
+
+      window.addEventListener(
+        'touchmove',
+        (e) => {
+          if (e.touches.length === 1) {
+            handlePanMove(e.touches[0].clientX, e.touches[0].clientY);
+          } else if (e.touches.length === 2 && initPinchDist > 0) {
+            const currentDist = Math.hypot(
+              e.touches[0].clientX - e.touches[1].clientX,
+              e.touches[0].clientY - e.touches[1].clientY
+            );
+            const scaleFactor = currentDist / initPinchDist;
+            this.setBoardZoom(initPinchZoom * scaleFactor);
+          }
+        },
+        { passive: true }
+      );
+
+      window.addEventListener(
+        'touchend',
+        (e) => {
+          isDragging = false;
+          initPinchDist = 0;
+          if (e.touches.length === 0) {
+            const now = Date.now();
+            if (now - lastTapTime < 300) {
+              if (this.boardZoom > 1.1) {
+                this.setBoardZoom(1, 0, 0);
+              } else {
+                this.focusCurrentPlayer();
+              }
+            }
+            lastTapTime = now;
+          }
+        },
+        { passive: true }
+      );
+    }
+  }
+
+  /**
+   * สลับแท็บแสดงผลบนหน้าจอมือถือ (CONTROLS / PLAYERS / LOGS)
+   * @param {string} tab
+   */
+  switchMobileTab(tab) {
+    this.mobileActiveTab = tab;
+    const tabs = this.container.querySelectorAll('.mobile-tab-btn');
+    tabs.forEach((b) => {
+      b.classList.toggle('active', b.getAttribute('data-tab') === tab);
+    });
+
+    const sidebar = this.container.querySelector('#game-sidebar-section');
+    if (sidebar) {
+      sidebar.setAttribute('data-mobile-active-tab', tab);
+    }
+  }
+
+  /**
+   * ปรับระดับการซูมและตำแหน่งของกระดานเกม
+   * @param {number} zoom
+   * @param {number} [panX]
+   * @param {number} [panY]
+   */
+  setBoardZoom(zoom, panX = this.boardPanX, panY = this.boardPanY) {
+    this.boardZoom = Math.max(0.85, Math.min(2.5, zoom));
+    if (this.boardZoom === 1) {
+      this.boardPanX = 0;
+      this.boardPanY = 0;
+    } else {
+      this.boardPanX = panX;
+      this.boardPanY = panY;
+    }
+    this.applyBoardTransform();
+  }
+
+  /**
+   * ปรับใช้ CSS Transform กับรูปกระดานเกม
+   */
+  applyBoardTransform() {
+    const wrapper = this.container.querySelector('#board-image-wrapper');
+    if (wrapper) {
+      wrapper.style.transform = `scale(${this.boardZoom}) translate(${this.boardPanX}px, ${this.boardPanY}px)`;
+      wrapper.style.transformOrigin = 'center center';
+      wrapper.style.transition = 'transform 0.22s ease-out';
+    }
+  }
+
+  /**
+   * โฟกัสและเลื่อนหน้าจอไปยังตำแหน่งตัวหมากของผู้เล่นปัจจุบันโดยอัตโนมัติ
+   */
+  focusCurrentPlayer() {
+    const targetPlayer = this.phase === 'DETERMINE_ORDER'
+      ? (this.players[this.currentRollPlayerIndex] || this.players[0])
+      : (this.players[this.activePlayerIndex] || this.players[0]);
+    if (!targetPlayer) return;
+
+    const coord = this.getTileCoordinates(targetPlayer.position || 0);
+    const deltaX = (50 - coord.x) * 4.2;
+    const deltaY = (50 - coord.y) * 3.2;
+
+    this.setBoardZoom(1.6, deltaX, deltaY);
+
+    const tokenNode = this.container.querySelector(`#player-token-node-${targetPlayer.id}`);
+    if (tokenNode) {
+      tokenNode.classList.add('token-focus-pulse');
+      setTimeout(() => tokenNode.classList.remove('token-focus-pulse'), 1500);
     }
   }
 
@@ -988,7 +1222,7 @@ export class GameBoardScreen {
         notice.innerHTML = `<span>ℹ️ ขณะนี้อยู่ในขั้นตอนกำหนดลำดับการเล่น — ผู้เล่นทุกคนทอยเต๋าคนละ 1 ครั้ง (${orderBadge})</span>`;
       } else {
         const activeP = this.players[this.activePlayerIndex];
-        notice.innerHTML = `<span>🎮 เริ่มเทิร์นการเล่น — คิวของ <b>${activeP ? activeP.name : ''}</b> (${orderBadge} | ${finishBadge})</span>`;
+        notice.innerHTML = `<span>🎮 เริ่มเทิร์นการเล่น — คิวของ <b>${escapeHtml(activeP ? activeP.name : '')}</b> (${orderBadge} | ${finishBadge})</span>`;
       }
     }
   }
@@ -1131,6 +1365,34 @@ export class GameBoardScreen {
       btnRoll.classList.remove('rolling-disabled');
     }
 
+    // ซิงค์ปุ่มและข้อมูลไปยัง Mobile Bottom Dock
+    const btnMobileRoll = this.container.querySelector('#btn-mobile-roll-dice');
+    const btnMobileRollText = this.container.querySelector('#btn-mobile-roll-text');
+    const mobileTurnName = this.container.querySelector('#mobile-turn-name');
+    const mobileTurnDot = this.container.querySelector('#mobile-turn-dot');
+
+    if (btnMobileRoll && btnRoll) {
+      btnMobileRoll.disabled = btnRoll.disabled;
+      btnMobileRoll.classList.toggle('rolling-disabled', btnRoll.disabled);
+    }
+    if (btnMobileRollText && btnRollText) {
+      btnMobileRollText.textContent = btnRollText.textContent;
+    }
+    if (mobileTurnName) {
+      const currentP = this.phase === 'DETERMINE_ORDER'
+        ? (this.players[this.currentRollPlayerIndex] || this.players[0])
+        : (this.players[this.activePlayerIndex] || this.players[0]);
+      if (currentP) {
+        mobileTurnName.textContent = this.phase === 'DETERMINE_ORDER'
+          ? `🎯 คิว: ${currentP.name}`
+          : `👑 ถึงตา: ${currentP.name}`;
+        if (mobileTurnDot) {
+          mobileTurnDot.style.background = currentP.color || '#f59e0b';
+          mobileTurnDot.style.boxShadow = `0 0 8px ${currentP.color || '#f59e0b'}`;
+        }
+      }
+    }
+
     this.checkAutoRoll();
   }
 
@@ -1259,9 +1521,9 @@ export class GameBoardScreen {
         return `
         <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.6); border: 1px solid ${colorHex}44; border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 0.5rem;">
           <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <span style="font-size: 1.1rem; font-weight: 800; color: #fbbf24; min-width: 75px;">${p.turnOrder}</span>
+            <span style="font-size: 1.1rem; font-weight: 800; color: #fbbf24; min-width: 75px;">${escapeHtml(p.turnOrder)}</span>
             <span style="width: 14px; height: 14px; border-radius: 50%; background: ${colorHex}; box-shadow: 0 0 8px ${colorHex}; display: inline-block;"></span>
-            <span style="font-weight: 700; font-size: 0.95rem; color: white;">${p.name} (${colorName})</span>
+            <span style="font-weight: 700; font-size: 0.95rem; color: white;">${escapeHtml(p.name)} (${escapeHtml(colorName)})</span>
           </div>
           <div style="display: flex; align-items: center; gap: 0.5rem;">
             <span style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); padding: 0.25rem 0.6rem; border-radius: 0.5rem; font-weight: 700; font-size: 0.85rem;">
@@ -1290,7 +1552,7 @@ export class GameBoardScreen {
             ${playersListHtml}
           </div>
           <button class="btn-action btn-roll-dice-active" id="btn-start-first-turn" style="width: 100%; justify-content: center; font-size: 1rem; padding: 0.8rem;">
-            🎮 เริ่มเทิร์นของผู้เล่นคนแรก (${firstPlayer.name})
+            🎮 เริ่มเทิร์นของผู้เล่นคนแรก (${escapeHtml(firstPlayer ? firstPlayer.name : '')})
           </button>
         </div>
       </div>
@@ -1319,7 +1581,7 @@ export class GameBoardScreen {
     this.players.forEach((p) => {
       this.addLogEntry(`  ${p.turnOrder}: ${p.name}`, 'info');
     });
-    this.addLogEntry(`🎮 เริ่มเทิร์นของผู้เล่นคนแรก: [${this.players[0].name}]`, 'system');
+    this.addLogEntry(`🎮 เริ่มเทิร์นของผู้เล่นคนแรก: [${this.players[0] ? this.players[0].name : ''}]`, 'system');
 
     const playersListHtml = this.players
       .map((p) => {
@@ -1330,9 +1592,9 @@ export class GameBoardScreen {
         return `
         <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.8); border: 1.5px solid ${colorHex}55; border-radius: 0.85rem; padding: 0.85rem 1.1rem; margin-bottom: 0.6rem; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
           <div style="display: flex; align-items: center; gap: 0.85rem;">
-            <span style="font-size: 1.15rem; font-weight: 800; color: #fbbf24; min-width: 80px;">${p.turnOrder}</span>
+            <span style="font-size: 1.15rem; font-weight: 800; color: #fbbf24; min-width: 80px;">${escapeHtml(p.turnOrder)}</span>
             <span style="width: 16px; height: 16px; border-radius: 50%; background: ${colorHex}; box-shadow: 0 0 10px ${colorHex}; display: inline-block;"></span>
-            <span style="font-weight: 800; font-size: 1rem; color: white;">${p.name} <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 500;">(${colorName})</span></span>
+            <span style="font-weight: 800; font-size: 1rem; color: white;">${escapeHtml(p.name)} <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 500;">(${escapeHtml(colorName)})</span></span>
           </div>
           <div style="display: flex; align-items: center; gap: 0.5rem;">
             ${
@@ -1364,7 +1626,7 @@ export class GameBoardScreen {
             ${playersListHtml}
           </div>
           <button class="btn-action btn-roll-dice-active" id="btn-start-random-first-turn" style="width: 100%; justify-content: center; font-size: 1.05rem; padding: 0.85rem; font-weight: 800; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #0f172a; border-radius: 0.75rem; cursor: pointer; border: none; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); display: flex; align-items: center; gap: 0.5rem;">
-            🎮 เริ่มเทิร์นของผู้เล่นคนแรก (${firstPlayer.name})
+            🎮 เริ่มเทิร์นของผู้เล่นคนแรก (${escapeHtml(firstPlayer ? firstPlayer.name : '')})
           </button>
         </div>
       </div>
@@ -1401,10 +1663,17 @@ export class GameBoardScreen {
 
     const entryDiv = document.createElement('div');
     entryDiv.className = `log-entry log-${type}`;
-    entryDiv.innerHTML = `
-      <span class="log-time">[${timeStr}]</span>
-      <span class="log-text">${text}</span>
-    `;
+
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'log-time';
+    timeSpan.textContent = `[${timeStr}] `;
+
+    const textSpan = document.createElement('span');
+    textSpan.className = 'log-text';
+    textSpan.textContent = text;
+
+    entryDiv.appendChild(timeSpan);
+    entryDiv.appendChild(textSpan);
 
     logContainer.appendChild(entryDiv);
     logContainer.scrollTop = logContainer.scrollHeight;
@@ -2496,12 +2765,12 @@ export class GameBoardScreen {
             </div>
             <div style="text-align: left;">
               <div style="font-weight: 700; color: #f8fafc; font-size: 0.95rem; display: flex; align-items: center; gap: 0.35rem;">
-                ${p.name}
+                ${escapeHtml(p.name)}
                 ${isMe ? '<span style="font-size: 0.72rem; background: rgba(59,130,246,0.3); color: #60a5fa; border: 1px solid rgba(59,130,246,0.5); padding: 1px 6px; border-radius: 999px;">คุณ</span>' : ''}
                 ${isPlayerHost ? '<span style="font-size: 0.72rem; background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.5); padding: 1px 6px; border-radius: 999px;">👑 เจ้าของห้อง</span>' : ''}
               </div>
               <div style="font-size: 0.8rem; color: #94a3b8;">
-                สี${p.colorName || colorObj.name || 'ตัวหมาก'}
+                สี${escapeHtml(p.colorName || colorObj.name || 'ตัวหมาก')}
               </div>
             </div>
           </div>
@@ -2525,7 +2794,7 @@ export class GameBoardScreen {
                 ความพร้อมก่อนเริ่มเกมรอบใหม่
               </h3>
               <p style="color: #94a3b8; font-size: 0.82rem; margin: 0.2rem 0 0 0;">
-                รหัสห้อง: <strong style="color: #fbbf24; letter-spacing: 1px;">${currentRoom?.roomCode || 'N/A'}</strong> | ยืนยันความพร้อมก่อนเริ่มเกม
+                รหัสห้อง: <strong style="color: #fbbf24; letter-spacing: 1px;">${escapeHtml(currentRoom?.roomCode || 'N/A')}</strong> | ยืนยันความพร้อมก่อนเริ่มเกม
               </p>
             </div>
           </div>
@@ -2649,7 +2918,7 @@ export class GameBoardScreen {
             ⚠️
           </div>
           <h3 style="font-size: 1.35rem; font-weight: 800; color: #f87171; margin: 0 0 0.5rem 0;">
-            ${message}
+            ${escapeHtml(message)}
           </h3>
           <p style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.6; margin: 0 0 1.5rem 0;">
             ผู้สร้างห้องได้ออกจากห้องแล้ว ระบบได้ทำการปิดห้องและนำคุณกลับสู่หน้าเมนูหลัก

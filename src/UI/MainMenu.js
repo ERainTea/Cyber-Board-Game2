@@ -84,7 +84,7 @@ export class MainMenu {
               <span>เริ่มเกม (Offline / Local)</span>
             </button>
 
-            <button class="menu-btn menu-btn-multiplayer" id="btn-multiplayer" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); border: 1px solid #60a5fa;">
+            <button class="menu-btn menu-btn-multiplayer" id="btn-multiplayer">
               <span class="menu-btn-icon">🌐</span>
               <span>เล่นออนไลน์ (Multiplayer)</span>
             </button>
@@ -97,11 +97,6 @@ export class MainMenu {
             <button class="menu-btn menu-btn-settings" id="btn-settings">
               <span class="menu-btn-icon">⚙️</span>
               <span>ตั้งค่า</span>
-            </button>
-
-            <button class="menu-btn menu-btn-exit" id="btn-exit-game">
-              <span class="menu-btn-icon">🚪</span>
-              <span>ออกจากเกม</span>
             </button>
           </div>
 
@@ -127,13 +122,11 @@ export class MainMenu {
     const btnMultiplayer = document.getElementById('btn-multiplayer');
     const btnManual = document.getElementById('btn-how-to-play');
     const btnSettings = document.getElementById('btn-settings');
-    const btnExit = document.getElementById('btn-exit-game');
 
     if (btnStart) btnStart.onclick = () => this.onStartGame();
     if (btnMultiplayer) btnMultiplayer.onclick = () => gameStateStore.setState({ phase: 'MULTIPLAYER_LOBBY' });
     if (btnManual) btnManual.onclick = () => this.openManualModal();
     if (btnSettings) btnSettings.onclick = () => this.openSettingsModal();
-    if (btnExit) btnExit.onclick = () => this.openExitModal();
   }
 
   /**
@@ -330,38 +323,6 @@ export class MainMenu {
     }
   }
 
-  /**
-   * เปิด Dialog ยืนยันการออกจากเกม
-   */
-  openExitModal() {
-    this.openModal(`
-      <div class="modal-content" style="max-width: 400px;">
-        <div class="modal-body exit-dialog-body">
-          <span class="exit-icon">🚪</span>
-          <h3 class="exit-title">ยืนยันการออกจากเกม</h3>
-          <p class="exit-desc">คุณต้องการออกจาก Cyber Board Game ใช่หรือไม่?</p>
-          <div class="exit-actions">
-            <button class="btn-confirm-exit" id="btn-confirm-exit">ยืนยัน</button>
-            <button class="btn-cancel-exit" id="btn-cancel-exit">ยกเลิก</button>
-          </div>
-        </div>
-      </div>
-    `);
-
-    const confirmBtn = document.getElementById('btn-confirm-exit');
-    const cancelBtn = document.getElementById('btn-cancel-exit');
-
-    if (confirmBtn) {
-      confirmBtn.onclick = () => {
-        alert('ขอบคุณที่ร่วมเล่น Cyber Board Game!');
-        this.closeModal();
-      };
-    }
-
-    if (cancelBtn) {
-      cancelBtn.onclick = () => this.closeModal();
-    }
-  }
 
   /**
    * เปิด Modal กลาง

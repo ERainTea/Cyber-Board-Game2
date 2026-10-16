@@ -9,6 +9,7 @@ import { gameStateStore } from '../GameState.js';
 import { soundManager } from '../Audio/SoundManager.js';
 import { networkManager, NETWORK_MODES } from '../Network/NetworkManager.js';
 import { PacketManager, PACKET_TYPES } from '../Network/PacketManager.js';
+import { escapeHtml } from '../Utils/security.js';
 
 export class FinishManager {
   constructor() {
@@ -173,7 +174,7 @@ export class FinishManager {
             <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
               <div style="width: 22px; height: 22px; border-radius: 50%; background: ${winnerColorHex}; border: 2px solid #ffffff; box-shadow: 0 0 8px ${winnerColorHex};"></div>
               <span style="font-size: 1.4rem; font-weight: 800; color: #ffffff;">
-                ${winner.name} <span style="font-size: 0.95rem; color: #cbd5e1; font-weight: 500;">(${winnerColorName})</span>
+                ${escapeHtml(winner.name)} <span style="font-size: 0.95rem; color: #cbd5e1; font-weight: 500;">(${escapeHtml(winnerColorName)})</span>
               </span>
             </div>
             <p style="color: #4ade80; font-size: 0.85rem; margin-top: 0.4rem; font-weight: 600;">
@@ -201,7 +202,7 @@ export class FinishManager {
                         <span style="font-size: 1.2rem; width: 28px; text-align: center;">${rankIcon}</span>
                         <div style="width: 16px; height: 16px; border-radius: 50%; background: ${pColorHex}; border: 1px solid white;"></div>
                         <span style="font-weight: 700; color: ${isWin ? '#fbbf24' : '#f8fafc'}; font-size: 0.95rem;">
-                          ${p.name}
+                          ${escapeHtml(p.name)}
                         </span>
                       </div>
 

@@ -12,6 +12,7 @@ import { CONNECTION_STATUS } from '../Network/ConnectionManager.js';
 import { PacketManager, PACKET_TYPES } from '../Network/PacketManager.js';
 import { eventBus } from '../Engine/EventBus.js';
 import { TOKEN_COLORS } from './PieceSelectScreen.js';
+import { escapeHtml, sanitizePlainText } from '../Utils/security.js';
 
 export class LobbyScreen {
   /**
@@ -22,7 +23,7 @@ export class LobbyScreen {
     this.container = container;
     this.onBackToMenu = onBackToMenu;
 
-    this.playerName = localStorage.getItem('multiplayer_player_name') || `ผู้เล่น_${Math.floor(1000 + Math.random() * 9000)}`;
+    this.playerName = sanitizePlainText(localStorage.getItem('multiplayer_player_name'), 20) || `ผู้เล่น_${Math.floor(1000 + Math.random() * 9000)}`;
     this.playerColor = '#3b82f6';
     
     // Create Room Form State
@@ -161,7 +162,7 @@ export class LobbyScreen {
     modal.innerHTML = `
       <div style="background: #0f172a; border: 2px solid #ef4444; box-shadow: 0 0 30px rgba(239,68,68,0.4); border-radius: 16px; max-width: 420px; width: 90%; padding: 1.75rem; text-align: center; color: white;">
         <div style="font-size: 3rem; margin-bottom: 0.5rem;">⚠️</div>
-        <h3 style="font-size: 1.3rem; font-weight: 800; color: #f87171; margin-bottom: 0.5rem;">${message}</h3>
+        <h3 style="font-size: 1.3rem; font-weight: 800; color: #f87171; margin-bottom: 0.5rem;">${escapeHtml(message)}</h3>
         <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.5;">ผู้สร้างห้องได้ปิดห้องหรือออกจากห้องแล้ว ระบบนำคุณกลับสู่หน้ารายการห้อง</p>
         <button id="btn-close-host-closed-notice" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">รับทราบ</button>
       </div>
@@ -237,7 +238,7 @@ export class LobbyScreen {
         <!-- Alert Error Message -->
         ${this.errorMessage ? `
           <div style="width: 100%; max-width: 900px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 0.85rem 1.25rem; border-radius: 12px; margin-bottom: 1.25rem; font-size: 0.95rem; text-align: center; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-            <span>⚠️</span> <span>${this.errorMessage}</span>
+            <span>⚠️</span> <span>${escapeHtml(this.errorMessage)}</span>
           </div>
         ` : ''}
 
@@ -274,7 +275,8 @@ export class LobbyScreen {
           <input 
             type="text" 
             id="input-player-name" 
-            value="${this.playerName}" 
+            value="${escapeHtml(this.playerName)}" 
+            maxlength="20"
             placeholder="ป้อนชื่อผู้เล่นของคุณ..." 
             style="flex: 1; padding: 0.85rem 1rem; background: #1e293b; border: 1px solid #475569; border-radius: 10px; color: white; font-size: 1.05rem; font-weight: 600; outline: none; box-sizing: border-box;"
           />
@@ -306,7 +308,8 @@ export class LobbyScreen {
                 type="text" 
                 id="input-create-room-name" 
                 placeholder="เช่น ห้องประลอง Cyber, ศึกชิงแชมป์..." 
-                value="${this.createRoomName}"
+                value="${escapeHtml(this.createRoomName)}"
+                maxlength="24"
                 style="width: 100%; padding: 0.65rem 0.85rem; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: white; font-size: 0.9rem; outline: none; box-sizing: border-box;"
               />
             </div>
@@ -324,7 +327,7 @@ export class LobbyScreen {
                     type="password" 
                     id="input-create-password" 
                     placeholder="ป้อนรหัสผ่านห้อง..." 
-                    value="${this.createPassword}"
+                    value="${escapeHtml(this.createPassword)}"
                     style="width: 100%; padding: 0.55rem 0.75rem; background: #1e293b; border: 1px solid #f59e0b; border-radius: 6px; color: white; font-size: 0.85rem; outline: none; box-sizing: border-box;"
                   />
                 </div>
@@ -385,7 +388,7 @@ export class LobbyScreen {
                 type="text" 
                 id="input-room-code" 
                 placeholder="รหัสห้อง 6 หลัก..." 
-                value="${this.inputRoomCode}"
+                value="${escapeHtml(this.inputRoomCode)}"
                 maxlength="6"
                 style="width: 100%; padding: 0.75rem; text-align: center; font-size: 1.25rem; font-weight: 900; font-family: monospace; letter-spacing: 4px; text-transform: uppercase; background: #0f172a; border: 2px solid #3b82f6; border-radius: 10px; color: #fbbf24; box-sizing: border-box; outline: none;"
               />
@@ -399,7 +402,7 @@ export class LobbyScreen {
                 type="password" 
                 id="input-join-password" 
                 placeholder="รหัสผ่านห้อง (ถ้ามี)..." 
-                value="${this.inputJoinPassword}"
+                value="${escapeHtml(this.inputJoinPassword)}"
                 style="width: 100%; padding: 0.65rem 0.85rem; text-align: center; font-size: 0.95rem; background: #0f172a; border: 1px solid #475569; border-radius: 8px; color: white; box-sizing: border-box; outline: none;"
               />
             </div>
@@ -462,10 +465,10 @@ export class LobbyScreen {
               <div style="display: flex; flex-direction: column; gap: 0.35rem;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
                   <span style="font-weight: 800; font-size: 1.05rem; color: #f8fafc;">
-                    ${r.roomName || `ห้อง ${r.roomCode}`}
+                    ${escapeHtml(r.roomName || `ห้อง ${r.roomCode}`)}
                   </span>
                   <span style="font-family: monospace; font-size: 0.95rem; font-weight: 900; color: #fbbf24; background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); padding: 0.15rem 0.5rem; border-radius: 6px; letter-spacing: 1px;">
-                    #${r.roomCode}
+                    #${escapeHtml(r.roomCode)}
                   </span>
                   ${r.hasPassword ? `
                     <span style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 0.75rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 6px;">
@@ -490,8 +493,8 @@ export class LobbyScreen {
 
               <button 
                 class="btn-quick-join-room" 
-                data-room-code="${r.roomCode}"
-                data-room-name="${r.roomName || `ห้อง ${r.roomCode}`}"
+                data-room-code="${escapeHtml(r.roomCode)}"
+                data-room-name="${escapeHtml(r.roomName || `ห้อง ${r.roomCode}`)}"
                 data-has-password="${r.hasPassword ? 'true' : 'false'}"
                 style="background: #3b82f6; color: white; border: none; padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.15s ease;"
               >
@@ -515,7 +518,7 @@ export class LobbyScreen {
           <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔒</div>
           <h3 style="color: #fbbf24; font-size: 1.35rem; font-weight: 800; margin: 0 0 0.4rem 0;">ห้องนี้ต้องใช้รหัสผ่าน</h3>
           <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 1.25rem;">
-            กรุณาป้อนรหัสผ่านเพื่อเข้าร่วม <b>${this.passwordModalRoom.roomName}</b> (#${this.passwordModalRoom.roomCode})
+            กรุณาป้อนรหัสผ่านเพื่อเข้าร่วม <b>${escapeHtml(this.passwordModalRoom.roomName)}</b> (#${escapeHtml(this.passwordModalRoom.roomCode)})
           </p>
 
           <input 
@@ -552,13 +555,14 @@ export class LobbyScreen {
         if (!code) return;
 
         if (hasPassword) {
-          this.passwordModalRoom = { roomCode: code, roomName: name };
+          this.passwordModalRoom = { roomCode: sanitizePlainText(code, 6), roomName: sanitizePlainText(name, 24) };
           this.render();
         } else {
           this.inputRoomCode = code;
+          const safePlayerName = sanitizePlainText(this.playerName, 20) || 'ผู้เล่น';
           const packet = PacketManager.createPacket(PACKET_TYPES.JOIN_ROOM, {
             roomCode: code,
-            user: { name: this.playerName }
+            user: { name: safePlayerName }
           });
           networkManager.sendPacket(packet);
         }
@@ -585,7 +589,7 @@ export class LobbyScreen {
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
           <div>
             <h3 style="font-size: 1.35rem; font-weight: 900; color: #f8fafc; margin: 0 0 0.2rem 0; display: flex; align-items: center; gap: 0.5rem;">
-              <span>🏠</span> <span>${room.roomName || `ห้อง ${room.roomCode}`}</span>
+              <span>🏠</span> <span>${escapeHtml(room.roomName || `ห้อง ${room.roomCode}`)}</span>
               ${room.hasPassword ? '<span style="font-size:0.75rem; background:rgba(245,158,11,0.2); color:#fbbf24; border:1px solid #f59e0b; padding:0.1rem 0.4rem; border-radius:6px;">🔒 มีรหัสผ่าน</span>' : '<span style="font-size:0.75rem; background:rgba(16,185,129,0.2); color:#34d399; border:1px solid #10b981; padding:0.1rem 0.4rem; border-radius:6px;">🌐 สาธารณะ</span>'}
             </h3>
             <div style="font-size: 0.85rem; color: #94a3b8;">รหัสห้องสำหรับเชิญเพื่อนร่วมเล่น:</div>
@@ -594,7 +598,7 @@ export class LobbyScreen {
             📋 คัดลอกรหัส
           </button>
         </div>
-        <div style="font-size: 2.25rem; font-weight: 900; color: #fbbf24; font-family: monospace; letter-spacing: 4px; text-shadow: 0 0 15px rgba(251, 191, 36, 0.4);">${room.roomCode}</div>
+        <div style="font-size: 2.25rem; font-weight: 900; color: #fbbf24; font-family: monospace; letter-spacing: 4px; text-shadow: 0 0 15px rgba(251, 191, 36, 0.4);">${escapeHtml(room.roomCode)}</div>
       </div>
 
       <!-- Current Room Rules / Host Settings Panel -->
@@ -689,7 +693,7 @@ export class LobbyScreen {
                 <div style="width: 28px; height: 28px; border-radius: 50%; background: ${c.gradient || c.hex}; border: 2px solid white; box-shadow: 0 0 8px ${c.glow || 'rgba(0,0,0,0.3)'};"></div>
                 <span style="font-weight: bold; font-size: 0.85rem; color: #f8fafc;">${c.name}</span>
                 ${isMine ? '<span style="font-size: 0.72rem; color: #fbbf24; font-weight: 800;">(ของคุณ)</span>' : ''}
-                ${isTaken ? `<span style="font-size: 0.7rem; color: #fca5a5; overflow: hidden; text-overflow: ellipsis; max-width: 90px; white-space: nowrap;">🔒 ${occupant.name}</span>` : ''}
+                ${isTaken ? `<span style="font-size: 0.7rem; color: #fca5a5; overflow: hidden; text-overflow: ellipsis; max-width: 90px; white-space: nowrap;">🔒 ${escapeHtml(occupant.name)}</span>` : ''}
                 ${!isMine && !isTaken ? '<span style="font-size: 0.7rem; color: #34d399;">✨ เลือกได้</span>' : ''}
               </button>
             `;
@@ -715,7 +719,7 @@ export class LobbyScreen {
                   <div style="width: 28px; height: 28px; border-radius: 50%; background: ${colorObj.gradient || p.color}; border: 2px solid white; box-shadow: 0 0 8px rgba(255,255,255,0.3);"></div>
                   <div>
                     <div style="font-weight: 800; font-size: 0.95rem; color: #f8fafc;">
-                      ${p.name} ${isMe ? '<span style="font-size:0.75rem; color:#fbbf24;">(คุณ)</span>' : ''}
+                      ${escapeHtml(p.name)} ${isMe ? '<span style="font-size:0.75rem; color:#fbbf24;">(คุณ)</span>' : ''}
                     </div>
                     <div style="font-size: 0.75rem; color: #94a3b8; display: flex; gap: 0.4rem; margin-top: 0.15rem;">
                       ${p.isHost ? '<span style="color:#f59e0b; background:rgba(245,158,11,0.2); padding:0.1rem 0.4rem; border-radius:4px; font-weight:700;">👑 เจ้าของห้อง</span>' : ''}
@@ -777,13 +781,14 @@ export class LobbyScreen {
       const btnCancel = document.getElementById('modal-btn-cancel');
 
       const handleConfirm = () => {
-        const pass = modalInput ? modalInput.value.trim() : '';
+        const pass = modalInput ? sanitizePlainText(modalInput.value, 20) : '';
         const targetCode = this.passwordModalRoom?.roomCode;
         if (targetCode) {
+          const safePlayerName = sanitizePlainText(this.playerName, 20) || 'ผู้เล่น';
           const packet = PacketManager.createPacket(PACKET_TYPES.JOIN_ROOM, {
             roomCode: targetCode,
             password: pass,
-            user: { name: this.playerName }
+            user: { name: safePlayerName }
           });
           networkManager.sendPacket(packet);
         }
@@ -808,7 +813,7 @@ export class LobbyScreen {
       const inputName = document.getElementById('input-player-name');
       if (inputName) {
         inputName.oninput = (e) => {
-          this.playerName = e.target.value.trim() || 'ผู้เล่น';
+          this.playerName = sanitizePlainText(e.target.value, 20) || 'ผู้เล่น';
           localStorage.setItem('multiplayer_player_name', this.playerName);
         };
       }
@@ -828,7 +833,7 @@ export class LobbyScreen {
       const inputCreateName = document.getElementById('input-create-room-name');
       if (inputCreateName) {
         inputCreateName.oninput = (e) => {
-          this.createRoomName = e.target.value;
+          this.createRoomName = sanitizePlainText(e.target.value, 24);
         };
       }
 
@@ -873,7 +878,7 @@ export class LobbyScreen {
       const btnCreate = document.getElementById('btn-create-room');
       if (btnCreate) {
         btnCreate.onclick = () => {
-          const trimmedName = this.createRoomName.trim();
+          const trimmedName = sanitizePlainText(this.createRoomName, 24);
           
           // ตรวจสอบชื่อห้อง: ต้องไม่ซ้ำกับรูปแบบรหัส 6 หลัก
           if (trimmedName && /^[A-Za-z0-9]{6}$/.test(trimmedName)) {
@@ -888,10 +893,13 @@ export class LobbyScreen {
             return;
           }
 
+          const safePlayerName = sanitizePlainText(this.playerName, 20) || 'ผู้เล่น';
+          const safePassword = this.createHasPassword ? sanitizePlainText(this.createPassword, 20) : null;
+
           const packet = PacketManager.createPacket(PACKET_TYPES.CREATE_ROOM, {
-            user: { name: this.playerName },
+            user: { name: safePlayerName },
             roomName: trimmedName || undefined,
-            password: this.createHasPassword ? this.createPassword.trim() : null,
+            password: safePassword,
             orderMode: this.createOrderMode,
             finishMode: this.createFinishMode
           });
@@ -934,10 +942,12 @@ export class LobbyScreen {
             this.render();
             return;
           }
+          const safePlayerName = sanitizePlainText(this.playerName, 20) || 'ผู้เล่น';
+          const safePassword = this.inputJoinPassword.trim() ? sanitizePlainText(this.inputJoinPassword, 20) : undefined;
           const packet = PacketManager.createPacket(PACKET_TYPES.JOIN_ROOM, {
             roomCode: this.inputRoomCode,
-            password: this.inputJoinPassword.trim() || undefined,
-            user: { name: this.playerName }
+            password: safePassword,
+            user: { name: safePlayerName }
           });
           networkManager.sendPacket(packet);
         };

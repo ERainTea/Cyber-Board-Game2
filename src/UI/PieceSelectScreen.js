@@ -7,6 +7,7 @@
 
 import { gameStateStore } from '../GameState.js';
 import { CONFIG } from '../Config.js';
+import { escapeHtml } from '../Utils/security.js';
 
 export const TOKEN_COLORS = [
   {
@@ -160,9 +161,9 @@ export class PieceSelectScreen {
                       ${currentColor ? currentColor.icon : '❓'}
                     </div>
                     <div class="player-name-text">
-                      <span class="player-title-label">${player.name}</span>
+                      <span class="player-title-label">${escapeHtml(player.name)}</span>
                       <span class="player-status-sub">
-                        ${currentColor ? `เลือก: ${currentColor.name}` : 'ยังไม่ได้เลือกสี'}
+                        ${currentColor ? `เลือก: ${escapeHtml(currentColor.name)}` : 'ยังไม่ได้เลือกสี'}
                       </span>
                     </div>
                   </div>
@@ -186,16 +187,16 @@ export class PieceSelectScreen {
                           ${isTakenByOther ? 'disabled' : ''}
                           title="${
                             isTakenByOther
-                              ? `${color.name} (เลือกโดย ${owner?.name || ''})`
+                              ? `${escapeHtml(color.name)} (เลือกโดย ${escapeHtml(owner?.name || '')})`
                               : isChosenByMe
-                              ? `${color.name} (คุณเลือกอยู่)`
-                              : `เลือก${color.name}`
+                              ? `${escapeHtml(color.name)} (คุณเลือกอยู่)`
+                              : `เลือก${escapeHtml(color.name)}`
                           }"
                         >
                           <span class="chip-color-dot" style="background: ${color.gradient}; box-shadow: 0 0 8px ${color.glow};"></span>
-                          <span class="chip-color-name">${color.name}</span>
+                          <span class="chip-color-name">${escapeHtml(color.name)}</span>
                           ${isChosenByMe ? '<span class="chip-check">✓</span>' : ''}
-                          ${isTakenByOther ? `<span class="chip-taken-tag">${owner?.name || ''}</span>` : ''}
+                          ${isTakenByOther ? `<span class="chip-taken-tag">${escapeHtml(owner?.name || '')}</span>` : ''}
                         </button>
                       `;
                     }).join('')}
